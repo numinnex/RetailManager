@@ -46,7 +46,7 @@ namespace RMDesktopUI.ViewModels
 		public ProductModel SelectedProduct
 		{
 			get { return _selectedProduct; }
-			set { _selectedProduct = value; NotifyOfPropertyChange(() => SelectedProduct); }
+			set { _selectedProduct = value; NotifyOfPropertyChange(() => SelectedProduct); NotifyOfPropertyChange(() => CanAddToCart); }
 		}
 
 		private int _itemQuantity = 1;
