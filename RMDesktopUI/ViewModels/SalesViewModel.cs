@@ -1,5 +1,6 @@
 ﻿using Caliburn.Micro;
 using RMDesktopUI.Library.API;
+using RMDesktopUI.Library.Helpers;
 using RMDesktopUI.Library.Models;
 using System.ComponentModel;
 using System.Linq;
@@ -11,11 +12,12 @@ namespace RMDesktopUI.ViewModels
 	{
 		private BindingList<ProductModel> _products;
 		private IProductEndPoint _productEndPoint;
+		private IConfigHelper _configHelper;
 
-		public SalesViewModel(IProductEndPoint productEndPoint)
+		public SalesViewModel(IProductEndPoint productEndPoint, IConfigHelper configHelper)
 		{
 			_productEndPoint = productEndPoint;
-
+			_configHelper = configHelper;
 		}
 
 		protected override async void OnViewLoaded(object view)
@@ -66,30 +68,50 @@ namespace RMDesktopUI.ViewModels
 		{
 			get
 			{
-				decimal subTotal = 0;
-
-				foreach (var item in Cart)
-				{
-					subTotal += (item.Product.RetailPrice * item.QuantityInCart);
-				}
-
-				return subTotal.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("en-us"));
+				return CalculateSubTotal().ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("en-us"));
 			}
+		}
+		private decimal CalculateSubTotal()
+		{
+			decimal subTotal = 0;
+
+			foreach (var item in Cart)
+			{
+				subTotal += (item.Product.RetailPrice * item.QuantityInCart);
+			}
+
+			return subTotal;
+
 		}
 		public string Tax
 		{
 			get
 			{
-				// TODO - Replace with calculations
-				return "$0.00";
+				return CalculateTax().ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-us"));
 			}
+		}
+		private decimal CalculateTax()
+		{
+
+			decimal taxAmount = 0;
+			decimal taxRate = _configHelper.GetTaxRate()/100;
+
+			foreach (var item in Cart)
+			{
+				if (item.Product.IsTaxable)
+				{
+					taxAmount += (item.Product.RetailPrice * item.QuantityInCart * taxRate);
+
+				}
+			}
+			return taxAmount;
 		}
 		public string Total
 		{
 			get
 			{
-				// TODO - Replace with calculations
-				return "$0.00";
+				decimal total = CalculateSubTotal() + CalculateTax();
+				return total.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-us"));
 			}
 		}
 
@@ -132,8 +154,10 @@ namespace RMDesktopUI.ViewModels
 
 			SelectedProduct.QuantityInStock -= ItemQuantity;
 			ItemQuantity = 1;
-			
+
 			NotifyOfPropertyChange(() => SubTotal);
+			NotifyOfPropertyChange(() => Tax);
+			NotifyOfPropertyChange(() => Total);
 		}
 		public bool CanRemoveFromCart()
 		{
@@ -144,6 +168,8 @@ namespace RMDesktopUI.ViewModels
 		{
 
 			NotifyOfPropertyChange(() => SubTotal);
+			NotifyOfPropertyChange(() => Tax);
+			NotifyOfPropertyChange(() => Total);
 		}
 
 
