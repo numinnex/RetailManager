@@ -1,20 +1,31 @@
 ﻿using Caliburn.Micro;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using RMDesktopUI.EventModels;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RMDesktopUI.ViewModels
 {
-    public class ShellViewModel : Conductor<object>
+    public class ShellViewModel : Conductor<object>, IHandle<LogOnEventModel>
     {
-        private LoginViewModel _loginVM;
-        public ShellViewModel(LoginViewModel loginVM)
+        private IEventAggregator _eventAggregator;
+        private SalesViewModel _salesVM;
+        private SimpleContainer _container;
+        public ShellViewModel(IEventAggregator events, SalesViewModel salesVM, SimpleContainer container)
         {
-            _loginVM = loginVM;
+
+            _salesVM = salesVM;
+            _container = container;
+            _eventAggregator = events;
+
+            _eventAggregator.Subscribe(this);
+
             //Activate Login Screen
-            ActivateItemAsync(_loginVM);
+            ActivateItemAsync(_container.GetInstance<LoginViewModel>());
+        }
+
+        public async Task HandleAsync(LogOnEventModel message, CancellationToken cancellationToken)
+        {
+            await ActivateItemAsync(_salesVM);
         }
     }
 }

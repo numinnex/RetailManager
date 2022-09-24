@@ -16,9 +16,9 @@ namespace RMDesktopUI.ViewModels
 				NotifyOfPropertyChange(() => Products);
 			}
 		}
-		private string _itemQuantity;
+		private int _itemQuantity;
 
-		public string ItemQuantity
+		public int ItemQuantity
 		{
 			get { return _itemQuantity; }
 			set { _itemQuantity = value; NotifyOfPropertyChange(() => ItemQuantity); }
@@ -60,7 +60,7 @@ namespace RMDesktopUI.ViewModels
 		public bool CanCheckOut()
 		{
 			//TODO - Make sure something is on the cart
-			return true;
+			return false;
 		}
 		public void CheckOut()
 		{
@@ -69,7 +69,7 @@ namespace RMDesktopUI.ViewModels
 		public bool CanAddToCart()
 		{
 			// TODO - Make sure something is selected, and there is an item quantity
-			return true;
+			return false;
 		}
 
 		public void AddToCart()
@@ -79,7 +79,7 @@ namespace RMDesktopUI.ViewModels
 		public bool CanRemoveFromCart()
 		{
 			// TODO - Remove from cart can method
-			return true;
+			return false;
 		}
 		public void RemoveFromCart()
 		{
