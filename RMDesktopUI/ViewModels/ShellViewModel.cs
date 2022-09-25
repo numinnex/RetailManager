@@ -1,5 +1,6 @@
 ﻿using Caliburn.Micro;
 using RMDesktopUI.EventModels;
+using RMDesktopUI.Library.Models;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,21 +10,46 @@ namespace RMDesktopUI.ViewModels
     {
         private IEventAggregator _eventAggregator;
         private SalesViewModel _salesVM;
-        public ShellViewModel(IEventAggregator events, SalesViewModel salesVM )
+        private ILoggedInUserModel _loggedInUser;
+        public ShellViewModel(IEventAggregator events, SalesViewModel salesVM, ILoggedInUserModel loggedInUser)
         {
+            _loggedInUser = loggedInUser;
 
             _salesVM = salesVM;
             _eventAggregator = events;
 
-            _eventAggregator.Subscribe(this);
+            _eventAggregator.SubscribeOnPublishedThread(this);
 
             //Activate Login Screen
             ActivateItemAsync(IoC.Get<LoginViewModel>());
+        }
+        public void ExitApplication()
+        {
+            TryCloseAsync();
+        }
+        public void LogOut()
+        {
+            _loggedInUser.LogOffUser();
+            ActivateItemAsync(IoC.Get<LoginViewModel>());
+            NotifyOfPropertyChange(() => IsLoggedIn);
+        }
+        public bool IsLoggedIn
+        {
+            get
+            {
+                if (!string.IsNullOrWhiteSpace(_loggedInUser.Token))
+                    return true;
+                else
+                    return false;
+            }
+
+
         }
 
         public async Task HandleAsync(LogOnEventModel message, CancellationToken cancellationToken)
         {
             await ActivateItemAsync(_salesVM);
+            NotifyOfPropertyChange(() => IsLoggedIn);
         }
     }
 }

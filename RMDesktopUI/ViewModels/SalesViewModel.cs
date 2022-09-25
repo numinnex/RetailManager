@@ -64,6 +64,20 @@ namespace RMDesktopUI.ViewModels
 			get { return _itemQuantity; }
 			set { _itemQuantity = value; NotifyOfPropertyChange(() => ItemQuantity); NotifyOfPropertyChange(() => CanAddToCart); }
 		}
+
+		private async Task ResetSalesViewModel()
+		{
+			Cart = new BindingList<CartItemDisplayModel>();
+			await LoadProducts();
+
+			NotifyOfPropertyChange(() => CanCheckOut);
+			NotifyOfPropertyChange(() => SubTotal);
+			NotifyOfPropertyChange(() => Tax);
+			NotifyOfPropertyChange(() => Total);
+
+
+		}
+
 		private BindingList<CartItemDisplayModel> _cart = new BindingList<CartItemDisplayModel>();
 
 		public BindingList<CartItemDisplayModel> Cart
@@ -136,6 +150,8 @@ namespace RMDesktopUI.ViewModels
 			}
 			await _saleEndPoint.PostSale(sale);
 
+			await ResetSalesViewModel();
+
 		}
 		public bool CanAddToCart => (ItemQuantity > 0 && SelectedProduct?.QuantityInStock >= ItemQuantity ? true : false);
 
@@ -188,7 +204,7 @@ namespace RMDesktopUI.ViewModels
 			}
 		}
 		//&& SelectedCartItem?.Product.QuantityInStock > 0
-		public bool CanRemoveFromCart => SelectedCartItem != null  ? true : false;
+		public bool CanRemoveFromCart => SelectedCartItem != null ? true : false;
 		public void RemoveFromCart()
 		{
 
@@ -201,6 +217,7 @@ namespace RMDesktopUI.ViewModels
 				Cart.Remove(SelectedCartItem);
 
 			NotifyOfPropertyChange(() => CanCheckOut);
+			NotifyOfPropertyChange(() => CanAddToCart);
 			NotifyOfPropertyChange(() => SubTotal);
 			NotifyOfPropertyChange(() => Tax);
 			NotifyOfPropertyChange(() => Total);
