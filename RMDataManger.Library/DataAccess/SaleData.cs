@@ -12,7 +12,7 @@ namespace RMDataManger.Library.DataAccess
         {
             List<SaleDetailDBModel> details = new List<SaleDetailDBModel>();
             ProductData products = new ProductData();
-            var taxRate = ConfigHelper.GetTaxRate()/100;
+            var taxRate = ConfigHelper.GetTaxRate() / 100;
 
             foreach (var item in saleInfo.SaleDetails)
             {
@@ -42,18 +42,34 @@ namespace RMDataManger.Library.DataAccess
 
             sale.CashierId = cashierId;
 
-            SQLDataAccess sql = new SQLDataAccess();
 
-            sql.SaveData("dbo.spSale_Insert", sale, "RMData");
-
-            sale.Id = sql.LoadData<int, dynamic>("dbo.spSale_Lookup", new { sale.CashierId, sale.SaleDate }, "RMData").FirstOrDefault();
-
-
-            foreach (var item in details)
+            using (SQLDataAccess sql = new SQLDataAccess())
             {
-                item.SaleId = sale.Id;
-                sql.SaveData("dbo.spSaleDetail_Insert", item, "RMData");
+                try
+                {
+                    sql.StartTransaction("RMData");
+
+                    sql.SaveDataInTransaction("dbo.spSale_Insert", sale);
+                    sale.Id = sql.LoadDataInTransaction<int, dynamic>("dbo.spSale_Lookup", new { sale.CashierId, sale.SaleDate }).FirstOrDefault();
+
+                    foreach (var item in details)
+                    {
+                        item.SaleId = sale.Id;
+                        sql.SaveDataInTransaction("dbo.spSaleDetail_Insert", item);
+                    }
+
+                    //sql.CommitTransaction();
+                }
+                catch(Exception ex)
+                {
+                    sql.RollBackTransaction();
+                    throw;
+                }                
             }
+
+
+
+
 
 
         }
