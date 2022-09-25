@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RMDesktopUI.Library.Models
 {
-    public class SaleDetailModel
+    public class SaleDetailModel : ISaleDetailModel
     {
         public int ProductId { get; set; }
         public int Quantity { get; set; }

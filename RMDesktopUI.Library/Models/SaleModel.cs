@@ -8,6 +8,6 @@ namespace RMDesktopUI.Library.Models
 {
     public class SaleModel
     {
-        public List<SaleDetailModel> SaleDetails { get; set; }
+        public List<ISaleDetailModel> SaleDetails { get; set; }
     }
 }

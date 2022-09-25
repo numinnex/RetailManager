@@ -126,7 +126,7 @@ namespace RMDesktopUI.ViewModels
 		{
 			//Create sale model and post to the API
 			SaleModel sale = new SaleModel();
-			sale.SaleDetails = new List<SaleDetailModel>();
+			sale.SaleDetails = new List<ISaleDetailModel>();
 
 			foreach (var item in Cart)
 			{
