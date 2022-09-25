@@ -2,6 +2,7 @@
 using RMDesktopUI.Library.API;
 using RMDesktopUI.Library.Helpers;
 using RMDesktopUI.Library.Models;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,10 +14,12 @@ namespace RMDesktopUI.ViewModels
 		private BindingList<ProductModel> _products;
 		private IProductEndPoint _productEndPoint;
 		private IConfigHelper _configHelper;
+		private ISaleEndPoint _saleEndPoint;
 
-		public SalesViewModel(IProductEndPoint productEndPoint, IConfigHelper configHelper)
+		public SalesViewModel(IProductEndPoint productEndPoint, IConfigHelper configHelper ,ISaleEndPoint saleEndPoint)
 		{
 			_productEndPoint = productEndPoint;
+			_saleEndPoint = saleEndPoint;
 			_configHelper = configHelper;
 		}
 
@@ -94,7 +97,7 @@ namespace RMDesktopUI.ViewModels
 		{
 
 			decimal taxAmount = 0;
-			decimal taxRate = _configHelper.GetTaxRate()/100;
+			decimal taxRate = _configHelper.GetTaxRate() / 100;
 
 			taxAmount = Cart.Where(x => x.Product.IsTaxable).Sum(x => x.Product.RetailPrice * x.QuantityInCart * taxRate);
 
@@ -118,13 +121,23 @@ namespace RMDesktopUI.ViewModels
 		}
 
 
-		public bool CanCheckOut()
+		public bool CanCheckOut => Cart.Count > 0 ? true : false;
+		public async Task CheckOut()
 		{
-			//TODO - Make sure something is on the cart
-			return false;
-		}
-		public void CheckOut()
-		{
+			//Create sale model and post to the API
+			SaleModel sale = new SaleModel();
+			sale.SaleDetails = new List<SaleDetailModel>();
+
+			foreach (var item in Cart)
+			{
+				sale.SaleDetails.Add(new SaleDetailModel
+				{
+					ProductId = item.Product.Id,
+					Quantity = item.QuantityInCart
+
+				});
+			}
+			await _saleEndPoint.PostSale(sale);
 
 		}
 		public bool CanAddToCart => (ItemQuantity > 0 && SelectedProduct?.QuantityInStock >= ItemQuantity ? true : false);
@@ -137,6 +150,7 @@ namespace RMDesktopUI.ViewModels
 			if (existingItem != null)
 			{
 				existingItem.QuantityInCart += ItemQuantity;
+				SelectedProduct.QuantityInStock -= ItemQuantity;
 				// HACK - should be better solution
 				Cart.Remove(existingItem);
 				Cart.Add(existingItem);
@@ -157,6 +171,7 @@ namespace RMDesktopUI.ViewModels
 			SelectedProduct.QuantityInStock -= ItemQuantity;
 			ItemQuantity = 1;
 
+			NotifyOfPropertyChange(() => CanCheckOut);
 			NotifyOfPropertyChange(() => SubTotal);
 			NotifyOfPropertyChange(() => Tax);
 			NotifyOfPropertyChange(() => Total);
@@ -169,6 +184,7 @@ namespace RMDesktopUI.ViewModels
 		public void RemoveFromCart()
 		{
 
+			NotifyOfPropertyChange(() => CanCheckOut);
 			NotifyOfPropertyChange(() => SubTotal);
 			NotifyOfPropertyChange(() => Tax);
 			NotifyOfPropertyChange(() => Total);
