@@ -1,8 +1,10 @@
-﻿using Caliburn.Micro;
+﻿using AutoMapper;
+using Caliburn.Micro;
 using RMDesktopUI.Helpers;
 using RMDesktopUI.Library.API;
 using RMDesktopUI.Library.Helpers;
 using RMDesktopUI.Library.Models;
+using RMDesktopUI.Models;
 using RMDesktopUI.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -27,8 +29,28 @@ namespace RMDesktopUI
 
         }
         // **********DEPENDENCY INJECTION SETUP*********
+
+        private IMapper ConfigureAutoMapper()
+        {
+
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<ProductModel, ProductDisplayModel>();
+                cfg.CreateMap<CartItemModel, CartItemDisplayModel>();
+
+            });
+
+            var output = config.CreateMapper();
+            return output;
+        }
+
         protected override void Configure()
         {
+
+            var mapper = ConfigureAutoMapper();
+
+            _container.Instance(mapper);
+
             _container.Instance(_container)
                 .PerRequest<IProductEndPoint , ProductEndPoint>()
                 .PerRequest<ISaleEndPoint, SaleEndPoint>();
