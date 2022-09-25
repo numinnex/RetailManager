@@ -19,7 +19,7 @@ namespace RMDesktopUI.ViewModels
 		private ISaleEndPoint _saleEndPoint;
 		private IMapper _mapper;
 
-		public SalesViewModel(IProductEndPoint productEndPoint, IConfigHelper configHelper ,ISaleEndPoint saleEndPoint , IMapper mapper)
+		public SalesViewModel(IProductEndPoint productEndPoint, IConfigHelper configHelper, ISaleEndPoint saleEndPoint, IMapper mapper)
 		{
 			_productEndPoint = productEndPoint;
 			_saleEndPoint = saleEndPoint;
@@ -106,14 +106,6 @@ namespace RMDesktopUI.ViewModels
 
 			taxAmount = Cart.Where(x => x.Product.IsTaxable).Sum(x => x.Product.RetailPrice * x.QuantityInCart * taxRate);
 
-			//foreach (var item in Cart)
-			//{
-			//	if (item.Product.IsTaxable)
-			//	{
-			//		taxAmount += (item.Product.RetailPrice * item.QuantityInCart * taxRate);
-
-			//	}
-			//}
 			return taxAmount;
 		}
 		public string Total
@@ -177,13 +169,36 @@ namespace RMDesktopUI.ViewModels
 			NotifyOfPropertyChange(() => Tax);
 			NotifyOfPropertyChange(() => Total);
 		}
-		public bool CanRemoveFromCart()
+
+		private CartItemDisplayModel _selectedCartItem;
+
+		public CartItemDisplayModel SelectedCartItem
 		{
-			// TODO - Remove from cart can method
-			return false;
+			get
+			{
+				return _selectedCartItem;
+
+			}
+			set
+			{
+				_selectedCartItem = value;
+				NotifyOfPropertyChange(() => SelectedCartItem);
+				NotifyOfPropertyChange(() => CanRemoveFromCart);
+
+			}
 		}
+		//&& SelectedCartItem?.Product.QuantityInStock > 0
+		public bool CanRemoveFromCart => SelectedCartItem != null  ? true : false;
 		public void RemoveFromCart()
 		{
+
+
+			SelectedCartItem.Product.QuantityInStock++;
+
+			if (SelectedCartItem.QuantityInCart > 1)
+				SelectedCartItem.QuantityInCart--;
+			else
+				Cart.Remove(SelectedCartItem);
 
 			NotifyOfPropertyChange(() => CanCheckOut);
 			NotifyOfPropertyChange(() => SubTotal);
