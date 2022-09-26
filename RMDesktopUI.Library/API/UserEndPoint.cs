@@ -40,7 +40,7 @@ namespace RMDesktopUI.Library.API
         }
         public async Task AddUserToRole(string userId, string roleName)
         {
-            var data = new {userId , roleName};
+            var data = new {userId = userId , Role = roleName};
 
             using (HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("/api/User/Admin/AddRole", data))
             {
@@ -50,7 +50,7 @@ namespace RMDesktopUI.Library.API
         }
         public async Task RemoveUserFromRole(string userId, string roleName)
         {
-            var data = new {userId , roleName};
+            var data = new {userId = userId , Role = roleName};
 
             using (HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("/api/User/Admin/RemoveFromRole", data))
             {

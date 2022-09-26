@@ -31,6 +31,126 @@ namespace RMDesktopUI.ViewModels
 				NotifyOfPropertyChange(() => Users);
 			}
 		}
+		private ApplicationUserModel _selectedUser;
+		public ApplicationUserModel SelectedUser
+        {
+			get
+			{
+				return _selectedUser;
+			}
+			set
+			{
+				_selectedUser = value;
+				SelectedUserName = value.Email;
+
+				UserRoles.Clear();
+				UserRoles = new BindingList<string>(value.Roles.Select(x => x.Value).ToList());
+				LoadRoles();
+
+				NotifyOfPropertyChange(() => SelectedUser);
+			}
+
+		}
+
+		private string _selectedUserName;
+
+		public string SelectedUserName
+		{
+			get
+			{
+				return _selectedUserName;
+			}
+			set
+			{
+				_selectedUserName = value;
+				NotifyOfPropertyChange(() => SelectedUserName);
+			}
+		}
+		private BindingList<string> _UserRoles = new BindingList<string>();
+
+		public BindingList<string> UserRoles
+		{
+			get
+			{
+				return _UserRoles;
+			}
+			set
+			{
+				_UserRoles = value;
+				NotifyOfPropertyChange(() => UserRoles);
+			}
+		}
+		
+		private BindingList<string> _avaiableRoles = new BindingList<string>();
+
+		public BindingList<string> AvaiableRoles
+		{
+			get
+			{
+				return _avaiableRoles;
+			}
+			set
+			{
+				_avaiableRoles = value;
+				NotifyOfPropertyChange(() => AvaiableRoles);
+			}
+		}
+		private async Task LoadRoles()
+		{
+			var roles = await _userEndPoint.GetAllRoles();
+
+			foreach (var role in roles)
+			{
+				if (!UserRoles.Contains(role.Value))
+				{
+					AvaiableRoles.Add(role.Value);
+				}
+			}
+		}
+		//RemoveFromRole AddSelectedRole SelectedRoleToRemove SelectedRoleToAdd
+
+		private string _selectedUserRole;
+
+		public string SelectedUserRole
+        {
+			get
+			{
+				return _selectedUserRole;
+			}
+			set
+			{
+				_selectedUserRole = value;
+				NotifyOfPropertyChange(() => SelectedUserRole);
+			}
+		}
+		private string _selectedAvaiableRole;
+		public string SelectedAvaiableRole 
+		{
+			get
+			{
+				return _selectedAvaiableRole;
+			}
+			set
+			{
+				_selectedAvaiableRole = value;
+				NotifyOfPropertyChange(() => SelectedAvaiableRole);
+			}
+		}
+
+		public async void AddSelectedRole()
+		{
+			await _userEndPoint.AddUserToRole(SelectedUser.Id, SelectedAvaiableRole);
+
+			UserRoles.Add(SelectedAvaiableRole);
+			AvaiableRoles.Remove(SelectedAvaiableRole);
+		}
+		public async void RemoveFromRole()
+		{
+			await _userEndPoint.RemoveUserFromRole(SelectedUser.Id, SelectedUserRole);
+
+			AvaiableRoles.Add(SelectedUserRole);
+			UserRoles.Remove(SelectedUserRole);
+		}
 
 		public UserDisplayViewModel(StatusInfoViewModel status, IWindowManager window, IUserEndPoint userEndPoint)
 		{
