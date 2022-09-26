@@ -41,7 +41,11 @@
                      </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
-
         </ListBox>
+        <!-- Colume 2 -->
+            <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1" Grid.RowSpan="2">
+                <TextBlock x:Name="SelectedUserName" Text="test"/>
+
+            </StackPanel>
     </Grid>
 </UserControl>

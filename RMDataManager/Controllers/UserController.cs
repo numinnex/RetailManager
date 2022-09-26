@@ -21,7 +21,7 @@ namespace RMDataManager.Controllers
             return data.GetUserById(id).First();
 
         }
-        [Authorize (Roles ="Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         [Route("api/User/Admin/GetAllUsers")]
         public List<ApplicationUserModel> GetAllUsers()
@@ -47,7 +47,7 @@ namespace RMDataManager.Controllers
 
 
                     foreach (var r in user.Roles)
-                    {   
+                    {
                         u.Roles.Add(r.RoleId, roles.Where(x => x.Id == r.RoleId).First().Name);
 
                     }
@@ -56,6 +56,57 @@ namespace RMDataManager.Controllers
                 return output;
             }
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        [Route("api/User/Admin/GetAllRoles")]
+        public Dictionary<string, string> GetAllRoles()
+        {
+
+            using (var context = new ApplicationDbContext())
+            {
+                var roles = context.Roles.ToDictionary(x => x.Id , x=> x.Name);
+                return roles;
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [Route("api/User/Admin/AddRole")]
+        public void AddRole(UserRolePairModel pairing)
+        {
+            using (var context = new ApplicationDbContext())
+            {
+                var userStore = new UserStore<ApplicationUser>(context);
+                var userManager = new UserManager<ApplicationUser>(userStore);
+
+                userManager.AddToRole(pairing.UserId, pairing.Role);
+
+            }
+             
+
+        }
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [Route("api/User/Admin/RemoveFromRole")]
+        public void RemoveFromRole(UserRolePairModel pairing)
+        {
+            using (var context = new ApplicationDbContext())
+            {
+                var userStore = new UserStore<ApplicationUser>(context);
+                var userManager = new UserManager<ApplicationUser>(userStore);
+
+                userManager.RemoveFromRole(pairing.UserId, pairing.Role);
+
+            }
+
+        }
+
+
+
+
+
+
 
     }
 
