@@ -67,12 +67,16 @@ namespace RMDataManger.Library.Internal.DataAccess
         internal void CommitTransaction()
         {
             _transaction?.Commit();
+            _transaction = null; 
             _connection?.Close();
+            _connection = null;
         }
         internal void RollBackTransaction()
         {
             _transaction?.Rollback();
+            _transaction = null;
             _connection?.Close();
+            _connection = null;
         }
 
         public void Dispose()

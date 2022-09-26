@@ -42,7 +42,6 @@ namespace RMDataManger.Library.DataAccess
 
             sale.CashierId = cashierId;
 
-
             using (SQLDataAccess sql = new SQLDataAccess())
             {
                 try
@@ -58,21 +57,32 @@ namespace RMDataManger.Library.DataAccess
                         sql.SaveDataInTransaction("dbo.spSaleDetail_Insert", item);
                     }
 
-                    //sql.CommitTransaction();
+                    sql.CommitTransaction();
                 }
-                catch(Exception ex)
+                catch
                 {
                     sql.RollBackTransaction();
                     throw;
-                }                
+                }
             }
+        }
+        public List<SaleReportModel> GetSaleReport()
+        {
+            SQLDataAccess sql = new SQLDataAccess();
 
+            var output = sql.LoadData<SaleReportModel, dynamic>("dbo.spSale_SaleReport", new { }, "RMData");
 
-
-
-
-
+            return output;
         }
 
+
+
+
+
+
+
+
     }
+
+
 }
