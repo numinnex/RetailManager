@@ -30,6 +30,12 @@ namespace RMDesktopUI.ViewModels
         {
             TryCloseAsync();
         }
+
+        public void UserManagment()
+        {
+            ActivateItemAsync(IoC.Get<UserDisplayViewModel>());
+        }
+
         public void LogOut()
         {
             _loggedInUser.LogOffUser();
