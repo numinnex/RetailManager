@@ -10,15 +10,13 @@ namespace RMDesktopUI.ViewModels
     public class ShellViewModel : Conductor<object>, IHandle<LogOnEventModel>
     {
         private IEventAggregator _eventAggregator;
-        private SalesViewModel _salesVM;
         private ILoggedInUserModel _loggedInUser;
         private IAPIHelper _apiHelper;
-        public ShellViewModel(IEventAggregator events, SalesViewModel salesVM, ILoggedInUserModel loggedInUser, IAPIHelper apiHelper)
+        public ShellViewModel(IEventAggregator events, ILoggedInUserModel loggedInUser, IAPIHelper apiHelper)
         {
             _apiHelper = apiHelper;
             _loggedInUser = loggedInUser;
 
-            _salesVM = salesVM;
             _eventAggregator = events;
 
             _eventAggregator.SubscribeOnPublishedThread(this);
@@ -59,7 +57,7 @@ namespace RMDesktopUI.ViewModels
 
         public async Task HandleAsync(LogOnEventModel message, CancellationToken cancellationToken)
         {
-            await ActivateItemAsync(_salesVM);
+            await ActivateItemAsync(IoC.Get<SalesViewModel>());
             NotifyOfPropertyChange(() => IsLoggedIn);
         }
     }
