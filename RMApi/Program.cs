@@ -10,6 +10,8 @@ using RMDataManger.Library.Internal.DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//test github
+
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
