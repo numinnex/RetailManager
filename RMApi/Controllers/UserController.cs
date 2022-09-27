@@ -17,9 +17,11 @@ namespace RMApi.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private ApplicationDbContext _context;
         private IUserData _data;
+        private ILogger _logger;
 
-        public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager,  IUserData data)
+        public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager,  IUserData data, ILogger<UserController> logger)
         {
+            _logger = logger;
             _context = context;
             _data = data;
             _userManager = userManager;
@@ -80,7 +82,12 @@ namespace RMApi.Controllers
         [Route("Admin/AddRole")]
         public async Task AddRole(UserRolePairModel pairing)
         {
+            string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             var user = await _userManager.FindByIdAsync(pairing.UserId);
+
+            _logger.LogInformation("Admin {Admin} added user {User} to role {Role}" , id , user.Id , pairing.Role );
+
             await _userManager.AddToRoleAsync(user, pairing.Role);
         }
         [Authorize(Roles = "Admin")]
@@ -88,8 +95,12 @@ namespace RMApi.Controllers
         [Route("Admin/RemoveFromRole")]
         public async Task RemoveFromRole(UserRolePairModel pairing)
         {
+            string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var user = await _userManager.FindByIdAsync(pairing.UserId);
+
+            _logger.LogInformation("Admin {Admin} removed user {User} from role {Role}" , id , user.Id , pairing.Role );
+            
             await _userManager.RemoveFromRoleAsync(user, pairing.Role);
 
 
