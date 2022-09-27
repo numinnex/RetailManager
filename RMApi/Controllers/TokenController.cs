@@ -12,9 +12,11 @@ namespace RMApi.Controllers
     {
         private ApplicationDbContext _context;
         private UserManager<IdentityUser> _userManager;
-        public TokenController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        private IConfiguration _config;
+        public TokenController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IConfiguration config)
         {
             _context = context;
+            _config = config;
             _userManager = userManager;
 
         }
@@ -66,7 +68,7 @@ namespace RMApi.Controllers
             var token = new JwtSecurityToken(
                 new JwtHeader(
                     new SigningCredentials(
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes("MySecretKeyIsSecretSoDoNotTellToAnyoneAboutMySecretKey")),
+                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetValue<string>("Secrets:SecurityKey"))),
                         SecurityAlgorithms.HmacSha256)),
                     new JwtPayload(claims));
             
