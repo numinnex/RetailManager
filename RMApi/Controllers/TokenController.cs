@@ -66,10 +66,9 @@ namespace RMApi.Controllers
             var token = new JwtSecurityToken(
                 new JwtHeader(
                     new SigningCredentials(
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes("MySecretKeyIsSecretDoNotTellAnyonePlease")),
+                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes("MySecretKeyIsSecretSoDoNotTellToAnyoneAboutMySecretKey")),
                         SecurityAlgorithms.HmacSha256)),
                     new JwtPayload(claims));
-
             
             var output = new
             {
