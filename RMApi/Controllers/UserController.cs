@@ -14,6 +14,13 @@ namespace RMApi.Controllers
     [Authorize]
     public class UserController : ControllerBase
     {
+        private IConfiguration _config;
+        public UserController(IConfiguration config)
+        {
+
+            _config = config;
+        }
+
         private readonly UserManager<IdentityUser> _userManager;
 
         private ApplicationDbContext _context;
@@ -28,7 +35,7 @@ namespace RMApi.Controllers
         public UserModel GetById()
         {
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            UserData data = new UserData();
+            UserData data = new UserData(_config);
 
             return data.GetUserById(id).First();
 

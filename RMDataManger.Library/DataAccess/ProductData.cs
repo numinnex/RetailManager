@@ -1,4 +1,5 @@
-﻿using RMDataManger.Library.Internal.DataAccess;
+﻿using Microsoft.Extensions.Configuration;
+using RMDataManger.Library.Internal.DataAccess;
 using RMDataManger.Library.Models;
 using System;
 using System.Collections.Generic;
@@ -10,9 +11,14 @@ namespace RMDataManger.Library.DataAccess
 {
     public class ProductData
     {
+        private IConfiguration _config;
+        public ProductData(IConfiguration config)
+        {
+            _config = config;
+        }
         public List<ProductModel> GetProducts()
         {
-            SQLDataAccess sql = new SQLDataAccess();
+            SQLDataAccess sql = new SQLDataAccess(_config);
 
             var output = sql.LoadData<ProductModel , dynamic>("dbo.spProduct_GetAll", new { }, "RMData");
 
@@ -21,7 +27,7 @@ namespace RMDataManger.Library.DataAccess
 
         public ProductModel GetProductById(int productId)
         {
-            SQLDataAccess sql = new SQLDataAccess();
+            SQLDataAccess sql = new SQLDataAccess(_config);
 
             var output = sql.LoadData<ProductModel , dynamic>("dbo.spProduct_GetById", new { Id = productId }, "RMData").FirstOrDefault();
 

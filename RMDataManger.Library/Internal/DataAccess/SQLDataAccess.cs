@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -10,9 +11,17 @@ namespace RMDataManger.Library.Internal.DataAccess
 {
     internal class SQLDataAccess : IDisposable
     {
+        private IConfiguration _configuration;
+        public SQLDataAccess(IConfiguration config)
+        {
+            _configuration = config;
+        }
         internal string GetConnectionString(string name)
         {
-            return ConfigurationManager.ConnectionStrings[name].ConnectionString;
+            //return @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=RMData;Integrated Security=True;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+
+            return _configuration.GetConnectionString(name);
+            //return ConfigurationManager.ConnectionStrings[name].ConnectionString;
         }
 
         internal List<T> LoadData<T, U>(string storedProcedure, U parameters, string connectionStringName)
