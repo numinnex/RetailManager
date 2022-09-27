@@ -44,6 +44,7 @@ namespace RMDesktopUI.ViewModels
 				SelectedUserName = value.Email;
 
 				UserRoles.Clear();
+				AvaiableRoles.Clear();
 				UserRoles = new BindingList<string>(value.Roles.Select(x => x.Value).ToList());
 				LoadRoles();
 

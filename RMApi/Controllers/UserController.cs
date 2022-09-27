@@ -9,24 +9,18 @@ using System.Security.Claims;
 
 namespace RMApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/User")]
     [ApiController]
     [Authorize]
     public class UserController : ControllerBase
     {
         private IConfiguration _config;
-        public UserController(IConfiguration config)
-        {
-
-            _config = config;
-        }
-
         private readonly UserManager<IdentityUser> _userManager;
-
         private ApplicationDbContext _context;
 
-        public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IConfiguration config)
         {
+            _config = config;
             _context = context;
             _userManager = userManager;
         }
@@ -42,7 +36,7 @@ namespace RMApi.Controllers
         }
         [Authorize(Roles = "Admin")]
         [HttpGet]
-        [Route("api/User/Admin/GetAllUsers")]
+        [Route("Admin/GetAllUsers")]
         public List<ApplicationUserModel> GetAllUsers()
         {
             List<ApplicationUserModel> output = new List<ApplicationUserModel>();
@@ -74,7 +68,7 @@ namespace RMApi.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpGet]
-        [Route("api/User/Admin/GetAllRoles")]
+        [Route("Admin/GetAllRoles")]
         public Dictionary<string, string> GetAllRoles()
         {
 
@@ -84,7 +78,7 @@ namespace RMApi.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        [Route("api/User/Admin/AddRole")]
+        [Route("Admin/AddRole")]
         public async Task AddRole(UserRolePairModel pairing)
         {
             var user = await _userManager.FindByIdAsync(pairing.UserId);
@@ -92,12 +86,12 @@ namespace RMApi.Controllers
         }
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        [Route("api/User/Admin/RemoveFromRole")]
+        [Route("Admin/RemoveFromRole")]
         public async Task RemoveFromRole(UserRolePairModel pairing)
         {
 
             var user = await _userManager.FindByIdAsync(pairing.UserId);
-            _userManager.RemoveFromRoleAsync(user, pairing.Role);
+            await _userManager.RemoveFromRoleAsync(user, pairing.Role);
 
 
         }
