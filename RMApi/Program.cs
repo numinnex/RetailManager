@@ -5,6 +5,8 @@ using RMApi.Data;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using RMDataManger.Library.DataAccess;
+using RMDataManger.Library.Internal.DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,14 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+
+//Personal services
+builder.Services.AddTransient<IInventoryData, InventoryData>();
+builder.Services.AddTransient<IProductData, ProductData>();
+builder.Services.AddTransient<ISaleData, SaleData>();
+builder.Services.AddTransient<IUserData, UserData>();
+builder.Services.AddTransient<ISQLDataAccess, SQLDataAccess>();
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = "JwtBearer";

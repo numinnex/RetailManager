@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace RMDataManger.Library.Internal.DataAccess
 {
-    internal class SQLDataAccess : IDisposable
+    public class SQLDataAccess : IDisposable, ISQLDataAccess
     {
         private IConfiguration _configuration;
         public SQLDataAccess(IConfiguration config)
@@ -24,7 +24,7 @@ namespace RMDataManger.Library.Internal.DataAccess
             //return ConfigurationManager.ConnectionStrings[name].ConnectionString;
         }
 
-        internal List<T> LoadData<T, U>(string storedProcedure, U parameters, string connectionStringName)
+        public List<T> LoadData<T, U>(string storedProcedure, U parameters, string connectionStringName)
         {
             string connectionString = GetConnectionString(connectionStringName);
 
@@ -36,7 +36,7 @@ namespace RMDataManger.Library.Internal.DataAccess
             }
         }
 
-        internal void SaveData<T>(string storedProcedure, T parameters, string connectionStringName)
+        public void SaveData<T>(string storedProcedure, T parameters, string connectionStringName)
         {
             string connectionString = GetConnectionString(connectionStringName);
 
@@ -49,7 +49,7 @@ namespace RMDataManger.Library.Internal.DataAccess
         private IDbConnection _connection;
         private IDbTransaction _transaction;
 
-        internal void StartTransaction(string connectionStringName)
+        public void StartTransaction(string connectionStringName)
         {
             string connectionString = GetConnectionString(connectionStringName);
 
@@ -59,12 +59,12 @@ namespace RMDataManger.Library.Internal.DataAccess
             _transaction = _connection.BeginTransaction();
 
         }
-        internal void SaveDataInTransaction<T>(string storedProcedure, T parameters)
+        public void SaveDataInTransaction<T>(string storedProcedure, T parameters)
         {
             _connection.Execute(storedProcedure, parameters, commandType: CommandType.StoredProcedure, transaction: _transaction);
 
         }
-        internal List<T> LoadDataInTransaction<T, U>(string storedProcedure, U parameters)
+        public List<T> LoadDataInTransaction<T, U>(string storedProcedure, U parameters)
         {
 
             List<T> rows = _connection.Query<T>(storedProcedure, parameters, commandType: CommandType.StoredProcedure, transaction: _transaction).ToList();
@@ -73,14 +73,14 @@ namespace RMDataManger.Library.Internal.DataAccess
         }
 
 
-        internal void CommitTransaction()
+        public void CommitTransaction()
         {
             _transaction?.Commit();
-            _transaction = null; 
+            _transaction = null;
             _connection?.Close();
             _connection = null;
         }
-        internal void RollBackTransaction()
+        public void RollBackTransaction()
         {
             _transaction?.Rollback();
             _transaction = null;

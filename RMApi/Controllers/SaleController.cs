@@ -1,9 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Identity;
-using System.Net.Http;
 using RMDataManger.Library.DataAccess;
 using RMDataManger.Library.Models;
 using System.Security.Claims;
@@ -15,10 +11,10 @@ namespace RMApi.Controllers
     [Authorize]
     public class SaleController : ControllerBase
     {
-        private IConfiguration _config;
-        public SaleController(IConfiguration config)
+        private ISaleData _data;
+        public SaleController( ISaleData data)
         {
-            _config = config;
+            _data = data;
 
         }
         [Authorize(Roles = "Cashier")]
@@ -26,10 +22,8 @@ namespace RMApi.Controllers
         public void Post(SaleModel sale)
         {
 
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);  //RequestContext.Principal.Identity.GetUserId();
-
-            SaleData data = new SaleData(_config);
-            data.SaveSale(sale, userId);
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); 
+            _data.SaveSale(sale, userId);
 
         }
         [Authorize(Roles = "Admin,Manager")]
@@ -37,9 +31,7 @@ namespace RMApi.Controllers
         [HttpGet]
         public List<SaleReportModel> GetSalesReport()
         {
-            SaleData data = new SaleData(_config);
-
-            return data.GetSaleReport();
+            return _data.GetSaleReport();
         }
 
     }
