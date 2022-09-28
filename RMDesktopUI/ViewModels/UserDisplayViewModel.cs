@@ -65,6 +65,7 @@ namespace RMDesktopUI.ViewModels
 			{
 				_selectedUserName = value;
 				NotifyOfPropertyChange(() => SelectedUserName);
+				
 			}
 		}
 		private BindingList<string> _UserRoles = new BindingList<string>();
@@ -100,6 +101,8 @@ namespace RMDesktopUI.ViewModels
 		{
 			var roles = await _userEndPoint.GetAllRoles();
 
+			AvaiableRoles.Clear();
+
 			foreach (var role in roles)
 			{
 				if (!UserRoles.Contains(role.Value))
@@ -122,6 +125,7 @@ namespace RMDesktopUI.ViewModels
 			{
 				_selectedUserRole = value;
 				NotifyOfPropertyChange(() => SelectedUserRole);
+				NotifyOfPropertyChange(() => CanRemoveFromRole);
 			}
 		}
 		private string _selectedAvaiableRole;
@@ -135,6 +139,21 @@ namespace RMDesktopUI.ViewModels
 			{
 				_selectedAvaiableRole = value;
 				NotifyOfPropertyChange(() => SelectedAvaiableRole);
+				NotifyOfPropertyChange(() => CanAddSelectedRole);
+			}
+		}
+		public bool CanAddSelectedRole
+		{
+			get
+			{
+				return SelectedUser == null || SelectedAvaiableRole == null ? false : true;
+			}
+		}
+		public bool CanRemoveFromRole
+		{
+			get
+			{
+				return SelectedUser == null || SelectedUserRole == null ? false : true;
 			}
 		}
 
