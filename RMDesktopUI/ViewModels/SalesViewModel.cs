@@ -2,7 +2,6 @@
 using System;
 using Caliburn.Micro;
 using RMDesktopUI.Library.API;
-using RMDesktopUI.Library.Helpers;
 using RMDesktopUI.Library.Models;
 using RMDesktopUI.Models;
 using System.Collections.Generic;
@@ -11,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Dynamic;
 using System.Windows;
+using Microsoft.Extensions.Configuration;
 
 namespace RMDesktopUI.ViewModels
 {
@@ -18,14 +18,14 @@ namespace RMDesktopUI.ViewModels
 	{
 		private BindingList<ProductDisplayModel> _products;
 		private IProductEndPoint _productEndPoint;
-		private IConfigHelper _configHelper;
+		private IConfiguration _configHelper;
 		private ISaleEndPoint _saleEndPoint;
 		private IMapper _mapper;
 		private readonly StatusInfoViewModel _status;
 		private readonly IWindowManager _window;
 
-		public SalesViewModel(IProductEndPoint productEndPoint, IConfigHelper configHelper, ISaleEndPoint saleEndPoint, IMapper mapper , StatusInfoViewModel status,
-			IWindowManager window  )
+		public SalesViewModel(IProductEndPoint productEndPoint, IConfiguration configHelper, ISaleEndPoint saleEndPoint, IMapper mapper , StatusInfoViewModel status,
+			IWindowManager window )
 		{
 
 			_status = status;
@@ -150,7 +150,7 @@ namespace RMDesktopUI.ViewModels
 		{
 
 			decimal taxAmount = 0;
-			decimal taxRate = _configHelper.GetTaxRate() / 100;
+			decimal taxRate = _configHelper.GetValue<decimal>("taxRate") / 100;
 
 			taxAmount = Cart.Where(x => x.Product.IsTaxable).Sum(x => x.Product.RetailPrice * x.QuantityInCart * taxRate);
 
