@@ -32,7 +32,7 @@ namespace Portal.Models
 
             });
 
-            var authResult = await _client.PostAsync("https://localhost:7727/token", data);
+            var authResult = await _client.PostAsync("https://localhost:7227/token", data);
             var authContent = await authResult.Content.ReadAsStringAsync();
 
             if (!authResult.IsSuccessStatusCode)
