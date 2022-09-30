@@ -12,13 +12,17 @@ namespace Portal.Models
         private HttpClient _client;
         private AuthenticationStateProvider _authStateProvider;
         private ILocalStorageService _localStorage;
+        private IConfiguration _config;
+        private string authToken;
 
         public AuthenticationService(HttpClient client, AuthenticationStateProvider authStateProvider,
-            ILocalStorageService localStorage)
+            ILocalStorageService localStorage, IConfiguration config)
         {
             _client = client;
+            _config = config;
             _authStateProvider = authStateProvider;
             _localStorage = localStorage;
+            authToken = _config["authTokenStorageKey"];
 
         }
 
@@ -32,7 +36,9 @@ namespace Portal.Models
 
             });
 
-            var authResult = await _client.PostAsync("https://localhost:7227/token", data);
+            string api = _config["apiLocation"] + _config["tokenEndPoint"];
+
+            var authResult = await _client.PostAsync(api, data);
             var authContent = await authResult.Content.ReadAsStringAsync();
 
             if (!authResult.IsSuccessStatusCode)
@@ -40,7 +46,7 @@ namespace Portal.Models
 
             var result = JsonSerializer.Deserialize<AuthenticatedUserModel>(authContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-            await _localStorage.SetItemAsync("authToken", result.Access_Token);
+            await _localStorage.SetItemAsync(authToken, result.Access_Token);
 
             ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(result.Access_Token);
 
@@ -51,7 +57,8 @@ namespace Portal.Models
 
         public async Task Logout()
         {
-            await _localStorage.RemoveItemAsync("authToken");
+
+            await _localStorage.RemoveItemAsync(authToken);
             ((AuthStateProvider)_authStateProvider).NotifyUserLogOut();
             _client.DefaultRequestHeaders.Authorization = null;
         }
