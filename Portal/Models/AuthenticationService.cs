@@ -48,7 +48,7 @@ namespace Portal.Models
 
             await _localStorage.SetItemAsync(authToken, result.Access_Token);
 
-            ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(result.Access_Token);
+            await ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(result.Access_Token);
 
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", result.Access_Token);
 
@@ -57,10 +57,7 @@ namespace Portal.Models
 
         public async Task Logout()
         {
-
-            await _localStorage.RemoveItemAsync(authToken);
-            ((AuthStateProvider)_authStateProvider).NotifyUserLogOut();
-            _client.DefaultRequestHeaders.Authorization = null;
+            await ((AuthStateProvider)_authStateProvider).NotifyUserLogOut();
         }
 
     }

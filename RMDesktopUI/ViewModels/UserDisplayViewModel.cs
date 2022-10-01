@@ -14,9 +14,9 @@ namespace RMDesktopUI.ViewModels
 {
     public class UserDisplayViewModel : Screen
     {
-		private StatusInfoViewModel _status;
-		private IWindowManager _window;
-		private IUserEndPoint _userEndPoint;
+		private readonly StatusInfoViewModel _status;
+		private readonly IWindowManager _window;
+		private readonly IUserEndPoint _userEndPoint;
 		private BindingList<ApplicationUserModel> _users;
 
 		public BindingList<ApplicationUserModel> Users
@@ -46,7 +46,8 @@ namespace RMDesktopUI.ViewModels
 				UserRoles.Clear();
 				AvaiableRoles.Clear();
 				UserRoles = new BindingList<string>(value.Roles.Select(x => x.Value).ToList());
-				LoadRoles();
+				//TODO - Pull this out properly
+				LoadRoles().Wait();
 
 				NotifyOfPropertyChange(() => SelectedUser);
 			}

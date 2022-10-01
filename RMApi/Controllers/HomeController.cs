@@ -7,14 +7,8 @@ namespace RMApi.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private RoleManager<IdentityRole> _roleManager;
-        private UserManager<IdentityUser> _userManager;
-        public HomeController(ILogger<HomeController> logger , RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
+        public HomeController()
         {
-            _logger = logger;
-            _userManager = userManager;
-            _roleManager = roleManager;
         }
 
         public IActionResult Index()
@@ -22,7 +16,7 @@ namespace RMApi.Controllers
             return View();
         }
 
-        public async Task <IActionResult> Privacy()
+        public IActionResult Privacy()
         {
             //string[] roles = { "Admin", "Manager", "Cashier" };
 
