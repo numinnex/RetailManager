@@ -1,4 +1,5 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
+﻿<CascadingAuthenticationState>
+<Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
         <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
             <Authorizing>
@@ -6,6 +7,17 @@
                     Please wait, we are authorizing you.
                 </text>
             </Authorizing>
+            <NotAuthorized>
+                <h1>
+                    Oops, You do not have Access
+                </h1>
+                <p>
+                    The page or component you are trying to reach requires
+                    you to have more permissions than you currently do. Please
+                    contact the administrator if you think you have reached
+                    this page in error.
+                </p>
+            </NotAuthorized>
         </AuthorizeRouteView>
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
@@ -18,3 +30,5 @@
        </CascadingAuthenticationState> 
     </NotFound>
 </Router>
+
+</CascadingAuthenticationState>
