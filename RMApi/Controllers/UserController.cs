@@ -35,6 +35,53 @@ namespace RMApi.Controllers
             return _data.GetUserById(id).First();
 
         }
+
+        public record UserRegistrationModel(string FirstName, string LastName, string EmailAddres, string Password);
+
+        [HttpPost]
+        [Route("Register")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Register(UserRegistrationModel user)   
+        {
+            if(ModelState.IsValid)
+            {
+                var existingUser = await _userManager.FindByEmailAsync(user.EmailAddres);
+                if(existingUser is null)
+                {
+                    IdentityUser newUser = new()
+                    {
+                        Email = user.EmailAddres,
+                        EmailConfirmed = true,
+                        UserName = user.EmailAddres
+                    };
+                    IdentityResult result = await _userManager.CreateAsync(newUser , user.Password);
+
+                    if(result.Succeeded)
+                    {
+                        
+                        existingUser = await _userManager.FindByEmailAsync(user.EmailAddres);
+
+                        if(existingUser is null)
+                        {
+                            return BadRequest();
+                        }
+
+                        UserModel u = new()
+                        {
+                            Id = existingUser.Id,
+                            FirstName = user.FirstName,
+                            LastName = user.LastName,
+                            EmailAdress = user.EmailAddres
+                        };
+                        _data.CreateUser(u);
+                        return Ok();
+
+                    }
+                }
+            }
+            return BadRequest();
+        }
+
         [Authorize(Roles = "Admin")]
         [HttpGet]
         [Route("Admin/GetAllUsers")]
