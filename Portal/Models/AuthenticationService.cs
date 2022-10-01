@@ -36,7 +36,7 @@ namespace Portal.Models
 
             });
 
-            string api = _config["apiLocation"] + _config["tokenEndPoint"];
+            string api = _config["api"] + _config["tokenEndPoint"];
 
             var authResult = await _client.PostAsync(api, data);
             var authContent = await authResult.Content.ReadAsStringAsync();

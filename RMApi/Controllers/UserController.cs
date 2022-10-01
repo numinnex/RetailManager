@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace RMApi.Controllers
 {
-    [Route("api/User")]
+    [Route("api/[controller]")]
     [ApiController]
     [Authorize]
     public class UserController : ControllerBase
@@ -36,32 +36,37 @@ namespace RMApi.Controllers
 
         }
 
-        public record UserRegistrationModel(string FirstName, string LastName, string EmailAddres, string Password);
+        public record UserRegistrationModel(string FirstName, string LastName, string EmailAdress, string Password);
 
+
+    
+
+
+        [AllowAnonymous]
         [HttpPost]
         [Route("Register")]
-        [AllowAnonymous]
+
         public async Task<IActionResult> Register(UserRegistrationModel user)   
         {
             if(ModelState.IsValid)
             {
-                var existingUser = await _userManager.FindByEmailAsync(user.EmailAddres);
-                if(existingUser is null)
+                var existingUser = await _userManager.FindByEmailAsync(user.EmailAdress);
+                if (existingUser is null)
                 {
                     IdentityUser newUser = new()
                     {
-                        Email = user.EmailAddres,
+                        Email = user.EmailAdress,
                         EmailConfirmed = true,
-                        UserName = user.EmailAddres
+                        UserName = user.EmailAdress
                     };
-                    IdentityResult result = await _userManager.CreateAsync(newUser , user.Password);
+                    IdentityResult result = await _userManager.CreateAsync(newUser, user.Password);
 
-                    if(result.Succeeded)
+                    if (result.Succeeded)
                     {
-                        
-                        existingUser = await _userManager.FindByEmailAsync(user.EmailAddres);
 
-                        if(existingUser is null)
+                        existingUser = await _userManager.FindByEmailAsync(user.EmailAdress);
+
+                        if (existingUser is null)
                         {
                             return BadRequest();
                         }
@@ -71,7 +76,7 @@ namespace RMApi.Controllers
                             Id = existingUser.Id,
                             FirstName = user.FirstName,
                             LastName = user.LastName,
-                            EmailAdress = user.EmailAddres
+                            EmailAdress = user.EmailAdress
                         };
                         _data.CreateUser(u);
                         return Ok();

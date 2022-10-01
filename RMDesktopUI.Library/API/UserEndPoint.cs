@@ -28,6 +28,33 @@ namespace RMDesktopUI.Library.API
             }
 
         }
+        private class UserRegistrationModel
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string EmailAdress { get; set; }
+            public string Password { get; set; }
+        }
+
+        public async Task CreateUser(CreateUserModel user)
+        {
+            var data = new UserRegistrationModel()
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                EmailAdress = user.EmailAdress,
+                Password = user.Password
+
+            };
+
+            using (HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("/api/User/Register", data))
+            {
+                if(!response.IsSuccessStatusCode)
+                    throw new Exception(response.ReasonPhrase);
+
+            }
+
+        }
         public async Task<Dictionary<string,string>> GetAllRoles()
         {
             using (HttpResponseMessage response = await _apiHelper.ApiClient.GetAsync("/api/User/Admin/GetAllRoles"))
