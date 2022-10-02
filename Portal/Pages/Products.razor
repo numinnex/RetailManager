@@ -1,6 +1,8 @@
 ﻿@page "/products"
 
 @inject IProductEndPoint Prods
+@inject IConfiguration Config
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 
 @attribute [Authorize(Roles ="Cashier") ]
 
@@ -23,7 +25,14 @@
                         <div class="row">
                             <div class="col-12">
                                 <a href="">
-                                    <img src="https://dummyimage.com/1200x900/000/fff" class="img-fluid" alt="Placeholder Image" />
+                                    @if(string.IsNullOrWhiteSpace(p.ProductImage))
+                                    {
+                                        <img src="https://dummyimage.com/1200x900/000000/ffffff&text=Comming+soon" class="img-fluid" alt="Place Holder Image" />
+                                    }
+                                    else
+                                    {
+                                        <img src="@( $"{api}{p.ProductImage}" )" class="img-fluid" alt="@p.ProductName" />
+                                    }
                                 </a>
                                 <p class="my-2 text-center">
                                     @p.Description
@@ -52,10 +61,37 @@
 
 @code {
     private List<ProductModel> products;
-
+    private string api;
+    private const string ProductList = "productList";
+    private const string ProductCacheDate = "cacheDate";
     protected override async Task OnInitializedAsync()
     {
-        products = await Prods.GetAll();
+        api = Config.GetValue<string>("api");
+
+        products = await LocalStorage.GetItemAsync<List<ProductModel>>(ProductList);
+        DateTime? cacheDate = await LocalStorage.GetItemAsync<DateTime?>(ProductCacheDate);
+
+        double totalMinutes = 0;
+
+        if(cacheDate is not null)
+        {
+            totalMinutes = DateTime.UtcNow.Subtract((DateTime)cacheDate).TotalMinutes;
+        }
+
+
+        if(products is null || cacheDate is null || totalMinutes > 10)
+        { 
+            try
+            {
+                products = await Prods.GetAll();
+                await LocalStorage.SetItemAsync(ProductList, products);
+                await LocalStorage.SetItemAsync(ProductCacheDate,DateTime.UtcNow);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
     }
 
 

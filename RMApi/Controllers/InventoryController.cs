@@ -12,7 +12,7 @@ namespace RMApi.Controllers
     {
         private readonly IInventoryData _inventoryData;
 
-        public InventoryController( IInventoryData inventoryData)
+        public InventoryController(IInventoryData inventoryData)
         {
             _inventoryData = inventoryData;
         }
